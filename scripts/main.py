@@ -1,6 +1,4 @@
-import matplotlib.pyplot as plt
 from cam import Cam, moveType
-import numpy as np
 def main():
     cam = Cam(
         h=55,

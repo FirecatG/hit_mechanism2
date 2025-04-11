@@ -7,8 +7,7 @@ from enum import Enum
 class moveType(Enum):
     SIN_ACCELERATION = 1
     COS_ACCELERATION = 2
-    LINEAR = 3
-    CONSTANT = 4
+    CONSTANT = 3
 
 class Cam:
     def __init__(self, h, phi_1, alpha_1, phi_2, alpha_2, phi_s1, phi_s2, omega_1, e=10, r_0=10, 
