@@ -76,7 +76,14 @@ class Cam:
                     s = self.h * (1 + np.cos(np.pi * (phi - (self.phi_1 + self.phi_s1)) / self.phi_2)) / 2
                     v = -1 * np.pi * self.h * self.omega_1 / 2 / self.phi_2 * np.sin(np.pi * (phi - (self.phi_1 + self.phi_s1)) / self.phi_2)
                     a = -1 * np.pi * np.pi * self.h * self.omega_1**2 / 2 / self.phi_2**2 * np.cos(np.pi * (phi - (self.phi_1 + self.phi_s1)) / self.phi_2)
-
+                elif self.return_move_type == moveType.CONSTANT and phi < self.phi_1 + self.phi_s1 + self.phi_2/2:
+                    s = self.h - 2 * self.h / (self.phi_2)**2 * (phi - (self.phi_1 + self.phi_s1))**2
+                    v = -4 * self.h * (phi - (self.phi_1 + self.phi_s1)) * self.omega_1 / self.phi_2**2
+                    a = -4 * self.h * self.omega_1**2 / self.phi_2**2
+                elif self.return_move_type == moveType.CONSTANT and phi >= self.phi_1 + self.phi_s1 + self.phi_2/2:
+                    s = 2 * self.h / self.phi_2**2 * (self.phi_1 + self.phi_s1 + self.phi_2 - phi)**2
+                    v = -4 * self.h * self.omega_1 / self.phi_2**2 * (self.phi_1 + self.phi_s1 + self.phi_2 - phi) 
+                    a = 4 * self.h * self.omega_1**2 / self.phi_2**2
             elif phi > self.phi_1 and phi < self.phi_1 + self.phi_s1:
                 s = self.h
                 v = 0
@@ -178,11 +185,6 @@ class Cam:
         y_points = results['y_points']
         x_1_points = results['x_1_points']
         y_1_points = results['y_1_points']
-
-        # i = 0
-        # while i < len(x_points):
-        #     print(x_1_points[i], y_1_points[i],0)
-        #     i += 1
 
         plt.plot(phi_range, s_points, 'r-', linewidth=1.5)
         plt.xlabel(r'phi (°)', fontsize=10)
