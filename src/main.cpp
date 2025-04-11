@@ -24,8 +24,19 @@ int main(int argc, char** argv) {
     while (rclcpp::ok()) {
         i%=360;
         auto joint_state = sensor_msgs::msg::JointState();
-        joint_state.name = {"joint1", "joint2"};
-        joint_state.position = {i*2*M_PI/360,result.s_points[i++]};
+        joint_state.name = {"joint1", "joint2", "joint3"};
+        joint_state.header.stamp = node->now();
+        joint_state.header.frame_id = "base_link";
+        joint_state.position.resize(3);
+        double position1 = -2*i*M_PI/360;
+        position1-=1.1; //initial position
+        if (position1>M_PI) {
+            position1-=2*M_PI;
+        }
+        if (position1<-1*M_PI) {
+            position1+=2*M_PI;
+        }
+        joint_state.position = {position1,result.s_points[i++]/1000,0};
         publisher->publish(joint_state);
         RCLCPP_INFO(node->get_logger(), "Publishing joint state phi = %d , s = %.2f", i, result.s_points[i]);
         rate.sleep();

@@ -27,7 +27,7 @@ include_directories(include)
 add_executable(main
   src/main.cpp
 )
-install(DIRECTORY launch
+install(DIRECTORY launch urdf meshes config
   DESTINATION share/${PROJECT_NAME}/
 )
 
