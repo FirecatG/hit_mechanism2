@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from cam import Cam, moveType
+import numpy as np
 def main():
     cam = Cam(
         h=55,
@@ -7,13 +8,13 @@ def main():
         alpha_1=30,
         phi_2=135,
         alpha_2=65,
-        phi_s1=70,
-        phi_s2=25,
+        phi_s1=25,
+        phi_s2=70,
         omega_1=30,
         e=10,
-        r_0=10,
-        rise_move_type=moveType.SIN_ACCELERATION,  # 推程选择正弦加速度
-        return_move_type=moveType.COS_ACCELERATION  # 回程选择余弦加速度
+        r_0=10, 
+        rise_move_type=moveType.CONSTANT,  
+        return_move_type=moveType.COS_ACCELERATION  
     )
     results = cam.calculate()
     cam.plot_results(results)

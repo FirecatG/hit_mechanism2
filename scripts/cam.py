@@ -8,6 +8,7 @@ class moveType(Enum):
     SIN_ACCELERATION = 1
     COS_ACCELERATION = 2
     LINEAR = 3
+    CONSTANT = 4
 
 class Cam:
     def __init__(self, h, phi_1, alpha_1, phi_2, alpha_2, phi_s1, phi_s2, omega_1, e=10, r_0=10, 
@@ -43,9 +44,9 @@ class Cam:
         x_1_points = np.zeros(num_points)
         y_1_points = np.zeros(num_points)
 
+        omega_rad = np.deg2rad(self.omega_1)
         for idx in range(num_points):
             phi = phi_range[idx]
-            
             if phi <= self.phi_1:
                 if self.rise_move_type == moveType.SIN_ACCELERATION:
                     s = self.h * (phi / self.phi_1 - np.sin(2 * np.pi * phi / self.phi_1) / (2 * np.pi))
@@ -55,6 +56,14 @@ class Cam:
                     s = self.h / 2 * (1 - np.cos(np.pi * phi / self.phi_1))
                     v = np.pi * self.h * self.omega_1 / 2 / self.phi_1 * np.sin(np.pi * phi / self.phi_1)
                     a = np.pi ** 2 * self.h * self.omega_1**2 / 2 / self.phi_1**2 * np.cos(np.pi * phi / self.phi_1)
+                elif self.rise_move_type == moveType.CONSTANT and phi < self.phi_1/2:
+                    s = 2 * self.h * (phi / self.phi_1)**2
+                    v = 4 * self.h * phi * omega_rad / self.phi_1**2
+                    a = 4 * self.h * omega_rad**2 / self.phi_1**2
+                elif self.rise_move_type == moveType.CONSTANT and phi >= self.phi_1/2:
+                    s = self.h - 2 * self.h / (self.phi_1)**2 * (phi - self.phi_1 - self.phi_s1)**2
+                    v = -4 * self.h * (phi - self.phi_1 - self.phi_s1) * omega_rad / self.phi_1**2
+                    a = -4 * self.h * omega_rad**2 / self.phi_1**2
                 
             elif phi >= self.phi_1 + self.phi_s1 and phi <= self.phi_1 + self.phi_s1 + self.phi_2:
 
@@ -81,7 +90,7 @@ class Cam:
             v_points[idx] = v
             a_points[idx] = a
 
-            ds_dphi = v / self.omega_1
+            ds_dphi = v / omega_rad
             ds_dphi_points[idx] = ds_dphi
 
             if phi <= self.phi_1:
@@ -106,7 +115,7 @@ class Cam:
             phi = phi_range[idx]
             s = s_points[idx]
             ds_dphi = ds_dphi_points[idx]
-            dds_ddphi = a_points[idx] / self.omega_1**2
+            dds_ddphi = a_points[idx] / omega_rad**2
 
             alpha = np.degrees(np.arctan(abs(ds_dphi - self.e) / (s_0 + s)))
             alpha_points[idx] = alpha
@@ -118,7 +127,10 @@ class Cam:
             ddx = -(2 * ds_dphi - self.e) * np.cos(np.radians(phi)) - (dds_ddphi - s_0 - s) * np.sin(np.radians(phi))
             ddy = (dds_ddphi - s_0 - s) * np.cos(np.radians(phi)) - (2 * ds_dphi - self.e) * np.sin(np.radians(phi))
             rho = (dx**2 + dy**2)**1.5 / (dx * ddy - dy * ddx)
-            rho_points[idx] = rho
+            if(abs(rho) > 10000):
+                rho_points[idx] = rho_points[idx - 1]
+            else:
+                rho_points[idx] = abs(rho)
 
             x_points[idx] = x
             y_points[idx] = y
@@ -127,17 +139,18 @@ class Cam:
 
         rho = np.min(rho_points)
         r_r = np.floor(rho / 2)
-
+        print("r_r:", r_r)
         for idx in range(num_points):
             phi = phi_range[idx]
             x = x_points[idx]
             y = y_points[idx]
             dx = dx_points[idx]
             dy = dy_points[idx]
-            x_1 = x + r_r * dy / np.sqrt(dx**2 + dy**2)
-            y_1 = y - r_r * dx / np.sqrt(dx**2 + dy**2)
+            x_1 = x - r_r * dy / np.sqrt(dx**2 + dy**2)
+            y_1 = y + r_r * dx / np.sqrt(dx**2 + dy**2)
             x_1_points[idx] = x_1
             y_1_points[idx] = y_1
+        print("r_0:", self.r_0)
 
         return {
             'phi_range': phi_range,
@@ -166,10 +179,10 @@ class Cam:
         x_1_points = results['x_1_points']
         y_1_points = results['y_1_points']
 
-        i = 0
-        while i < len(x_points):
-            print(360/2/np.pi*ds_dphi_points[i],",",s_points[i])
-            i += 1
+        # i = 0
+        # while i < len(x_points):
+        #     print(x_1_points[i], y_1_points[i],0)
+        #     i += 1
 
         plt.plot(phi_range, s_points, 'r-', linewidth=1.5)
         plt.xlabel(r'phi (°)', fontsize=10)

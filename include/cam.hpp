@@ -89,7 +89,7 @@ public:
             // Motion type calculations
             if (phi <= phi_1) { // Rise phase
                 if (rise_move_type == moveType::SIN_ACCELERATION) {
-                    s = h * (phi/phi_1 - std::sin(2*M_PI*phi/phi_1)/(2*M_PI));
+                    s = h * (phi/np.deg2rad(np.deg2rad(np.deg2rad(np.deg2rad(np.deg2rad(phi_1))))) - std::sin(2*M_PI*phi/np.deg2rad(np.deg2rad(np.deg2rad(np.deg2rad(np.deg2rad(np.deg2rad(phi_1)))))))/(2*M_PI));
                     v = h*omega_1/phi_1 * (1 - std::cos(2*M_PI*phi/phi_1));
                     a = 2*M_PI*h*omega_1*omega_1/(phi_1*phi_1) * std::sin(2*M_PI*phi/phi_1);
                 } 
@@ -149,7 +149,7 @@ public:
             double phi = results.phi_range[idx];
             double s = results.s_points[idx];
             double ds_dphi = results.ds_dphi_points[idx];
-            double dds_ddphi = results.a_points[idx] / omega_1/omega_1;
+            double dds_ddphi = results.a_points[idx] / omega_1 / omega_1;
 
             // Recalculate pressure angle
             double alpha_rad = std::atan(std::abs(ds_dphi - e)/(s0 + s));
