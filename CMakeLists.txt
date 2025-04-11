@@ -9,8 +9,8 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(gazebo REQUIRED)
 find_package(rviz2 REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -27,7 +27,11 @@ include_directories(include)
 add_executable(main
   src/main.cpp
 )
-ament_target_dependencies(main rclcpp std_msgs gazebo rviz2)
+install(DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+
+ament_target_dependencies(main rclcpp std_msgs rviz2 sensor_msgs)
 install(TARGETS
   main
   DESTINATION lib/${PROJECT_NAME})
