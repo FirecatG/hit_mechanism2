@@ -149,7 +149,7 @@ public:
             double phi = results.phi_range[idx];
             double s = results.s_points[idx];
             double ds_dphi = results.ds_dphi_points[idx];
-            double dds_ddphi = results.a_points[idx] / omega_1;
+            double dds_ddphi = results.a_points[idx] / omega_1/omega_1;
 
             // Recalculate pressure angle
             double alpha_rad = std::atan(std::abs(ds_dphi - e)/(s0 + s));

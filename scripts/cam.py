@@ -106,7 +106,7 @@ class Cam:
             phi = phi_range[idx]
             s = s_points[idx]
             ds_dphi = ds_dphi_points[idx]
-            dds_ddphi = a_points[idx] / self.omega_1
+            dds_ddphi = a_points[idx] / self.omega_1**2
 
             alpha = np.degrees(np.arctan(abs(ds_dphi - self.e) / (s_0 + s)))
             alpha_points[idx] = alpha
